@@ -4,7 +4,7 @@ function verificaciones
 	clf
 	clear
 	%generar números aleatorios y almancenarlos en un archivo de excel
-	[XAleatorio YAleatorio]=vectoresAleatorios; %vector columna
+	[XAleatorio YAleatorio]=vectoresAleatorios(150,-10,10); %vector columna
 	[archivoEntrada hojaEntrada]=escribirExcelAleatorio(XAleatorio,YAleatorio); %vectores columna
 	%leer los datos de un archivo de excel
 	[X Y]=leerDatosExcel(archivoEntrada,hojaEntrada);
