@@ -1,3 +1,4 @@
 function [x]=SisEcVolumenes(A,b)
-	x=inve(A)*b;
+	%x=inv(A)*b;
+    x=A\b;
 end
