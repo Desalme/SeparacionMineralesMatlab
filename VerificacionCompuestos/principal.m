@@ -1,7 +1,7 @@
 %function principal(nombreArchivo, nombreHoja)
 function principal
-	%clf
-	%clear
+	clf
+	clear
 	%configuraciones de Matlab
 	addpath('./Compuestos/'); %añadir una subcarpeta del proyecto al path
 	warning('off','MATLAB:xlswrite:AddSheet'); %no mostrar advertencias cuando se crea una hoja nueva en el documento de excel
@@ -17,9 +17,11 @@ function principal
 	%escribir datos
 	nombreArchivoSalida='PruebaSalida.xlsx';
 
-	strNombreCompuestos=["ArcillaDOLSIL", "DOLCALSIL", "FI2CaCOCaCODOL", "FI2DOLDOLCaCO", "GYPANHDOL", "SalSIL"];
+	strNombreCompuestos=["ArcillaDOLSIL", "DOLCALSIL", "FI2CaCOCaCODOL", "FI2DOLDOLCaCO", "GYPANHDOL", "SalSIL", "FI2CaCOCaCOSil"];
 
-	for i=1:length(strNombreCompuestos)
+	longitud=length(strNombreCompuestos);
+
+	for i=1:longitud
 		tic
 		escribirExcelCompuesto(X,Y,strNombreCompuestos(i),nombreArchivoSalida);
 		tiempo=toc;
@@ -27,6 +29,21 @@ function principal
 		mensaje=strcat("El tiempo de ejecución de escribirExcel de ", strNombreCompuestos(i), " es de ", string(tiempo), " segundos.");
 		disp(mensaje);
 	end
+
+	%graficarInterfaces
+	for i=1:longitud
+		graficarInterfaces(strNombreCompuestos(i));
+		hold on;
+	end
+
+	%propiedades de la gráfica
+	title('Evaluación de litoporosidad');
+	xlabel('N');
+	ylabel('M');
+	legenda=convertStringsToChars(strNombreCompuestos);
+	legend(legenda);
+
+
 
 
 end

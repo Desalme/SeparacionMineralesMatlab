@@ -1,4 +1,4 @@
-function graficarInterfaces
+function graficarInterfaces2
 	[ax1 ay1 ax2 ay2 ax3 ay3]=constanteCompuesto;
 	VectoraX=[ax1 ax2 ax3 ax1];
 	VectoraY=[ay1 ay2 ay3 ay1];

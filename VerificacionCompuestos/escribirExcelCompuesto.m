@@ -8,7 +8,7 @@ function escribirExcelCompuesto(X,Y,nombreCompuesto,nombreArchivoSalida)
 	strfuncionEvaluar=strcat("verificacion",nombreCompuesto);
 	
 	for i=1:numPuntos
-		if feval(strfuncionEvaluar,X(i),Y(i))
+		if feval(strfuncionEvaluar,X(i),Y(i)) %"area",x, y=> area(x,y)
 			matriz=[matriz;i, X(i), Y(i)];
 		end
     end
