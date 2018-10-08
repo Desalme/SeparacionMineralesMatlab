@@ -7,13 +7,20 @@ function graficarInterfaces(nombreCompuesto)
 arregloIntermedio=zeros(1,numeroDevoluciones);
 	arregloIntermedio=feval(strFuncionEvaluar);
 %}		
-	if numeroDevoluciones==6
+	%{
+if numeroDevoluciones==6
 		[a,b,c,d,e,f]=feval(strFuncionEvaluar);
 		arregloIntermedio=[a b c d e f];
 	elseif numeroDevoluciones==8
 		[a,b,c,d,e,f,g,h]=feval(strFuncionEvaluar);
 		arregloIntermedio=[a b c d e f g h];
 	end
+%}
+
+
+	celdaIntermedia=cell(1,numeroDevoluciones);
+	[celdaIntermedia{:}]=feval(strFuncionEvaluar);
+	arregloIntermedio=cell2mat(celdaIntermedia);
 
 	vectorX=[];
 	vectorY=[];
