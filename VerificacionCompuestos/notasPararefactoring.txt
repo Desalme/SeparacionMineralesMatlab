@@ -1,0 +1,24 @@
+Determinar si se siguen ocupando funciones o si se ocupan mejor objetos para encapsular las propiedades de compuestos
+
+
+Estandarizar la salida de las funciones cuando se tratan de puntos x y. Probablemente lo mejor sería un arreglo de 2-4 entradas cuando sea aplicable lo siguiente:
+
+[indices X Y nombrecompuesto] 
+
+todas estas salidas son vectores, los índices son identificadores únicos dados por un número natural excluyendo al cero
+
+X es el vector con coordenadas x
+Y es el vector con coordenadas y
+
+nombre compuesto es un char arr con el nombre de compuesta al que corresponde el punto
+
+Estandarizar la salida de las funciones de cte+nombreCompuesto  de tal forma que ahora sean dos vectores con las coordenadas X y Y, los puntos deben tomarse en sentido levógiro
+[X Y]
+
+Las funciones verificacion +nombreCompuiesto no son necesarias
+Hay que generalizarlas, sustituirlas por una función verificacion que itere sobre todas las entradas de los nombres de los compuestos, 
+construir una función poligonoRegular (que incluya los casos triangulo y cuadrilatero) que tome un punto pivote de cte+nombreCompuesto y construya triángulos a partir de ahí para realizar la verificación del área en cuestión
+
+
+Hacer una función que cargue automaticamente los nombres de los compuestos a partir de los nombres de las funciones cte+nombreCompuesto y los guarde en un cell con char arr
+No utilizar strings a menos que sea necesario (optar por char array, porque es la entrada de muchas funciones en matlab), estadnrizar los tipos de todas las funciones. 

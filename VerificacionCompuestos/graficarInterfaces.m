@@ -1,4 +1,4 @@
-function graficarInterfaces(nombreCompuesto)
+function propiedadesGrafica=graficarInterfaces(nombreCompuesto, colorRGB)
 	strFuncionEvaluar=strcat("cte",nombreCompuesto);
 	charFuncionEvaluar=convertStringsToChars(strFuncionEvaluar);
 	numeroDevoluciones=nargout(str2func(charFuncionEvaluar));
@@ -36,6 +36,6 @@ if numeroDevoluciones==6
 	vectorX=[vectorX,arregloIntermedio(1)];
 	vectorY=[vectorY,arregloIntermedio(2)];
 
-	plot(vectorX, vectorY)
+	propiedadesGrafica=plot(vectorX, vectorY, 'color', colorRGB, 'LineWidth', 1);
 end
 

@@ -1,4 +1,4 @@
-function escribirExcelCompuesto(X,Y,nombreCompuesto,nombreArchivoSalida)
+function [matriz]=escribirExcelCompuesto(X,Y,nombreCompuesto,nombreArchivoSalida)
 	%C, Y deben de ser puntos, nombreCompuesto un string array, nombreArchivoSalida un char array
 	%aquí comienza la función
 	numPuntos=min([length(X) length(Y)]);
