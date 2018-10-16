@@ -1,5 +1,6 @@
 %function principal(nombreArchivo, nombreHoja)
-function principal
+%function principal
+
 	clf
 	clear
 	%configuraciones de Matlab
@@ -26,8 +27,9 @@ function principal
 	%escribir datos
 	nombreArchivoSalida='PruebaSalida.xlsx';
 
-	strNombreCompuestos=["ArcillaDOLSIL", "DOLCALSIL", "FI2CaCOCaCODOL", "FI2DOLDOLCaCO", "GYPANHDOL", "SalSIL", "FI2CaCOCaCOSil", "FI2SilSilCaCO"];
+	strNombreCompuestos=["GYPANHDOL","ArcillaDOLSIL", "DOLCALSIL", "SalSIL","FI2DOLDOLCaCO", "FI2CaCOCaCODOL", "FI2CaCOCaCOSil", "FI2SilSilCaCO"];
 	%strNombreCompuestos=["ArcillaDOLSIL"]
+	%strNombreCompuestos=["GYPANHDOL"];
 	longitud=length(strNombreCompuestos);
 	cellDatosMatrizCompuestos=cell(1,longitud);
 	%separando los datos en matrices distintas y guardándolas en un cerll rarray con indices de los nombres
@@ -69,11 +71,87 @@ function principal
 
 	%Guardar en Excel todos los datos y los sobrantes (los que están afuera)
 	%xlswrite(filename,A,sheet)
+	tic
 	xlswrite(nombreArchivoSalida,cellTodoslosDatos,'ResumenRegiones');
 	xlswrite(nombreArchivoSalida,cellSobrantes,'FueraDeRegion');
+	toc
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	tic
+	%Registros geológicos y matrices
+	registrosGeologicos={'DT','NPHI','RHOB'}; %no mover este orden porque se utiliza para la cosntruccion de abajo
+	cellVectoresIndependientes=leerRegistrosGeologicos('NuevoPozoPruebaDatos.xlsx','Hoja1',registrosGeologicos); %construye un cell array donde cada entrada es una columna de 4*1 donde cada entrada es un vector independiente 
+	
+	%inicializar cell arrays que tengan la matriz de coeficientes A y el vector independiente b para resolver un sistema de ecuaiones lineales 
+	cellb=cell(numPuntos,1);
+	cellA=cell(numPuntos,1);
+	cellX=cell(numPuntos,1);
+	% verificar que los datos tengan las mismas dimensiones
+	datosSonCorrectos=true;
+	for i=1:length(registrosGeologicos)
+		if length(cellVectoresIndependientes{i})==numPuntos
+			datosSonCorrectos=datosSonCorrectos&&true;
+		else
+			datosSonCorrectos=false;
+		end
+	end
 
+
+	if datosSonCorrectos
+		for i=1:numPuntos
+			%construir cell b
+			cellb{i}=[cellVectoresIndependientes{1}(i);cellVectoresIndependientes{2}(i);cellVectoresIndependientes{3}(i);1];
+			%construir cell A
+			nombreTemp=cellTodoslosDatos{i,4};
+%{
+			booleano=false;
+			for compuesto=1:longitud
+				booleano=booleano | contains(strNombreCompuestos{compuesto},nombreTemp);
+			end
+%}
+			if ~isempty(nombreTemp)
+			%si el renglon i de los datos está clasificado con un compuesto, entonces
+				%reemplazar esta cell a por una función que devuelva los parámetros de acuerdo al compuesto
+				cellA{i}=matrizCoeficientesA(nombreTemp);
+				%cellA{i}=[189,43.5,50,52;1,.02,0,.49;1,2.87,2.98,2.35;1,1,1,1];
+				%cellA{i}=[189,43.5,47.6,55.5;1,.02,0,-.035;1,2.87,2.71,2.65;1,1,1,1];
+				cellX{i}=linsolve(cellA{i},cellb{i});
+			end
+		end
+	end
+	longitudcellTodo=4+4+16+4; %'No.','N','M','NombreCompuesto','b1','b2','b3','b4','A11','A12','A13','A14','A21','A22','A23','A24', 'A31','A32','A33','A34', 'A41','A42','A43','A44','X1','X2','X3','X4'
+	cellTodo=cell(numPuntos,longitudcellTodo);
+	for i=1:numPuntos
+		for j=1:4
+			cellTodo{i,j}=cellTodoslosDatos{i,j};
+		end
+
+		for j2=1:4
+			cellTodo{i,j2+j}=cellb{i}(j2);
+		end	
+
+		if ~isempty(cellTodo{i,4});
+			for j3=1:4
+				for k=1:4
+					cellTodo{i,(j3-1)*4+k+j2+j}=cellA{i}(j3,k);
+				end
+			end
+
+			for j4=1:4
+				cellTodo{i,j4+j3*k+j2+j}=cellX{i}(j4);
+			end
+		end
+	end
+
+	encabezadosCellTodo={'No.','N','M','NombreCompuesto','b1','b2','b3','b4','A11','A12','A13','A14','A21','A22','A23','A24', 'A31','A32','A33','A34', 'A41','A42','A43','A44','X1','X2','X3','X4'};%'Phi_1', 'V_DOL', 'Vol_ANH','V_yes'}
+	datosExcelTodo=[encabezadosCellTodo; cellTodo];
+	toc
+	tic
+	xlswrite(nombreArchivoSalida,datosExcelTodo,'Todo');
+	toc
+	%disp(cellX{1});
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%graficar
-
+	tic
 	%colores RGB
 	colores={[.9,.22,.21],[.925,.251,.478],[.482,.122,.635],[.102,.137,.494],[.129,.588,.952],[.149,.776,.855],[.302,.714,.675],[.263,.627,.278], [.804,.863,.224],[1,.769,0], [.937,.424,0]};
 	
@@ -94,7 +172,7 @@ function principal
 	legend(graphObjArr,leyenda);
 	%saveas(gcf,'graficoLitoporosidad.png');
 	print('graficoLitoporosidad','-dpng','-r0') %guardar el archivo en imagen Use '-r0' to save it with screen resolution
-	
-end
+	toc
+%end
 
 
