@@ -1,0 +1,57 @@
+objeto
+4 PILARES
+HERENCIA
+ENCAPSULAMIENTO
+
+
+objeto={
+   propiedad1=valor1
+   propiedad=valorn
+}
+
+Carlos={
+   nombre=Carlos Prudhomme PUBLIC
+   direccion=Huayamilpas 17
+   edad=29
+}
+
+Ana={
+   nombre= Garza
+   direccion=Vagabundo
+   edad=? PRIVADA
+}
+
+camionetaAna={
+   marca=
+   modelo=
+
+}
+
+clase MUJER={
+   propiedades=[
+      nombre
+      direccion
+      fechaDeNacimiento
+   ]
+
+   metodo=[
+      funcion edad
+         a partir de la fecha de nac
+
+   ]
+}
+
+CALASE HUMANO={
+   CLASE HOMBRE
+   MUJER
+
+   ESTATURA
+}
+
+Constructor
+this, instanciate
+
+persona(Carlos, Huayamilpas, 11/11)
+
+Carlos.NOMBRE //CARLOS
+cARLOS.EDAD(fechaDeNacimiento) /29
