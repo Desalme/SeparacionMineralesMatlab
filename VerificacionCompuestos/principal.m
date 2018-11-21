@@ -95,6 +95,7 @@
 		end
 	end
 
+	
 
 	if datosSonCorrectos
 		for i=1:numPuntos
@@ -149,6 +150,15 @@
 	xlswrite(nombreArchivoSalida,datosExcelTodo,'Todo');
 	toc
 	%disp(cellX{1});
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	cellRegistrosPetrofisicos=[registrosGeologicos; cellVectoresIndependientes];
+	
+	indicesSobrantes=NaN(length(cellSobrantes),1);
+
+	for i=1:length(cellSobrantes)
+		indicesSobrantes(i) = cellSobrantes{i,1};
+	end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%graficar
 	tic
