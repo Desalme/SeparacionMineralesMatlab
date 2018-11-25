@@ -39,8 +39,22 @@ Qmax=max(roots(SolucionCoeficientes)); %Haciendo Cero a H,da solucion a una ecua
 %Crear al vectorQ utilizando el maximo caudal.
 VectorQ=linspace(Qmin,Qmax,250);
 
-%Crear al vector H (ya tenemos la funcion H).
+%Crear al vector H (ya tenemos la funcion H). Para la bomba
 VectorH=FuncionCargaH(A,B,C,VectorQ);
 
-plot(VectorQ,VectorH);
+%Función característica del sistema de ductos
+
+% Net Positive Suction Head (NPSH)
+%NPSH can be defined as two parts:
+%NPSH Available (NPSHA): The absolute pressure at the suction port of the pump.
+%NPSH Required (NPSHR): The minimum pressure required at the suction port of the pump to keep the pump from cavitating.
+NPSHAprox=abs(VectorCabezal(1)-VectorCabezal(end));
+
+%buscamos una k para la cual en Q especificado la carga H coincida
+QEsp = Qmax/4;
+kAprox = A + B/QEsp + C/QEsp^2 - NPSHAprox/QEsp^2;
+
+VectorHDucto = funcionCaracteristicaDuctos (kAprox,VectorQ, NPSHAprox);
+
+plot(VectorQ,VectorH, VectorQ, VectorHDucto);
 
