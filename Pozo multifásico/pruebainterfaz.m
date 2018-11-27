@@ -1,34 +1,39 @@
-%calcula las presiones de salida de una columna de líquido de un pozo mediante iteraciones a partir ade la densidad y de la relacion de solubilidad, de la densidad relativa del gas y de la presión de cabeza
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            vectorQ=linspace(app.Q_min.Value, app.Q_max.Value, app.IntervaloQ.Value)';
+            vectorPresionesMaximas = NaN(size(vectorQ));
+            
+            for varMuda = 1:length(vectorQ)
+                 %calcula las presiones de salida de una columna de lÃ­quido de un pozo mediante iteraciones a partir ade la densidad y de la relacion de solubilidad, de la densidad relativa del gas y de la presiÃ³n de cabeza
 %se calcula el primer punto de burbuja 
 
 %Datos de Entrada 
-Grados_API = 23;
-Pwh = 135; %Presion de Cabeza
-Tr = 7; %Tuberia de revestimiento
-Tp = 5.5; %Tuberia de Produccion
-Rugosidad = 0.0006;
-DensidadR_gas = 0.7;
-L = 6800; %En pies
-T_cabeza =  60 ;%Farenheit
-T_fondo = 230 ; %Temperatura de Fondo en Farenheit
-RGA = 54 ; %Unidades m^3/m^3
-Qo = 5000; %Barriles por dia
-Pwf = 2487; %Presion De Fondo Fluyendo en PSIA
-Pws = 2510; %Presion estatica o superficie en PSIA
-P_atm = 14.7; %Presion atmosferica en PSIA
-Densidad_aire = 0.0764; %Densidad del Aire en lb//ft^3
-Angulo=90;
-Viscosidad_aceite=24 ;%En Unidades Centipoise [cp]
-Qo_propuestoCE=5000 ;%Gasto Propuesto en bpd
-DensidadR_agua=62.4 ;
+Grados_API = app.Grados_API.Value;
+Pwh = app.Pwh.Value; %Presion de Cabeza
+Tr = app.Tr.Value; %Tuberia de revestimiento
+Tp = app.Tp.Value; %Tuberia de Produccion
+Rugosidad = app.Rugosidad.Value;
+DensidadR_gas = app.DensidadR_gas.Value;
+L = app.L.Value; %En pies
+T_cabeza =  app.T_cabeza.Value;%Farenheit
+T_fondo = app.T_fondo.Value ; %Temperatura de Fondo en Farenheit
+RGA = app.RGA.Value ; %Unidades m^3/m^3
+Qo = app.Qo.Value; %Barriles por dia
+Pwf = app.Pwf.Value; %Presion De Fondo Fluyendo en PSIA
+Pws = app.Pws.Value; %Presion estatica o superficie en PSIA
+P_atm = app.P_atm.Value; %Presion atmosferica en PSIA
+Densidad_aire = app.Densidad_aire.Value; %Densidad del Aire en lb//ft^3
+Angulo= app.Angulo.Value;
+Viscosidad_aceite= app.Viscosidad_aceite.Value ;%En Unidades Centipoise [cp]
+Qo_propuestoCE= vectorQ(varMuda);%Gasto Propuesto en bpd
+DensidadR_agua= app.DensidadR_agua.Value;
 
 %Opciones de calculo
 %CalculoCorrelaciones = {'Standing', 'Vazquez'}
-Opcion = 'Vazquez';
+Opcion = app.Opcion.Value;
 %Opcion = 'Standing';
 
 %calcul;os
-RsCE = RGA*5.615; % Relación de gas disuelto en solución (petroleo) para condiciones estandar. aproximidamente es una relación de solubilidad de gas, cambia en funcion de la presión y temperatura
+RsCE = RGA*5.615; % RelaciÃ³n de gas disuelto en soluciÃ³n (petroleo) para condiciones estandar. aproximidamente es una relaciÃ³n de solubilidad de gas, cambia en funcion de la presiÃ³n y temperatura
 
 %Se calcula la Densidad del aceite a partir de API
 Densidad_aceite=141.5/(Grados_API+131.5); 
@@ -38,14 +43,14 @@ P_burbuja = 18.2*( ( (RsCE/DensidadR_gas)^.83) * 10 ^( (0.00091*T_cabeza) - (0.0
 
 
 %distancia
-DistanciaDivision = 100; %el número de pies que el usuario quiere evaluar la nueva presion. verificar que sea menor a L
+DistanciaDivision = app.DistanciaDivision.Value; %el nÃºmero de pies que el usuario quiere evaluar la nueva presion. verificar que sea menor a L
 vectorDistancia = 0:DistanciaDivision:L;
 tamVector = length(vectorDistancia);
 
 %presion
-aumentoPresionAproxPorPie = .2;%.135; %esta es una condición experimental, está entre 10 y 30, tipicamente 20
+aumentoPresionAproxPorPie = .2;%.135; %esta es una condiciÃ³n experimental, estÃ¡ entre 10 y 30, tipicamente 20
 aumentoPresionAproxPorDivision = DistanciaDivision * aumentoPresionAproxPorPie; 
-P_salida = NaN(tamVector-1 , 1); %este vector comienza en la posición 2 del vector distancia
+P_salida = NaN(tamVector-1 , 1); %este vector comienza en la posiciÃ³n 2 del vector distancia
 
 %temperatura
 %vectorTemperatura = NaN(tamVector);
@@ -59,13 +64,13 @@ for i = 1:length(P_salida)
 	primerIteracionWhile = true;
 
 	while Error > 0.00000001
-		%presión
+		%presiÃ³n
 		if i == 1
 			P_entrada = Pwh;
 		else
 			P_entrada = P_salida(i-1);
 		end
-		%valor semilla presión
+		%valor semilla presiÃ³n
 		if primerIteracionWhile == true 
 			P_supuesta = P_entrada + aumentoPresionAproxPorDivision;
 			primerIteracionWhile = false;
@@ -81,7 +86,7 @@ for i = 1:length(P_salida)
 		T_promedio = mean([T_entrada, T_salida]);
 
 		%densidad de gas disuelto y solubilidad
-		%iteración \
+		%iteraciÃ³n \
 
 		[Rs, Densidad_gasDisuelto] = FuncionCorrelaciones(Opcion, Grados_API, DensidadR_gas, P_promedio, T_promedio);
 
@@ -103,15 +108,13 @@ for i = 1:length(P_salida)
 		k=((9.4+(0.5792*Densidad_gasL))*(T_promedio+460)^1.5)/((209+(550.24*Densidad_gasL)+(T_promedio+460)));
 
 		Viscosidad_gas=k*((10^(-4))*exp(x*(Densidad_gasL/62.928)^y));
-		
 		Bo=0.9759+0.00012*(Rs*((Densidad_gasDisuelto/Densidad_aceite)^0.5)+(1.25*T_promedio))^1.2;
-		
 		Ro_aceiteCF=((Densidad_aceite*DensidadR_agua)+(Densidad_gasDisuelto*Densidad_aire*Rs))/Bo;
 		A_total=(pi*(Tp/12)^2)/4;
-
-		Gasto_aceite_CF= Qo_propuestoCE *Bo*(5.615/1)*(1/86400);
+  
+		Gasto_aceite_CF= Qo_propuestoCE*Bo*(5.615/1)*(1/86400);
 		Gasto_gas_CF=Qo_propuestoCE*(RsCE-Rs)*Bg*(1/86400);
-
+  
 		vsl=Gasto_aceite_CF/A_total;
 		vsg=Gasto_gas_CF/A_total;
 		vm=vsg+vsl;
@@ -165,3 +168,8 @@ for i = 1:length(P_salida)
 	end
 end
 
+vectorPresionesMaximas(varMuda) = P_salida(end);
+
+Presion=[P_atm; P_salida];
+app.tabla.Data = array2table([vectorDistancia', vectorTemperatura', Presion]);
+            end
