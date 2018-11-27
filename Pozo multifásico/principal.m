@@ -1,4 +1,4 @@
-%calcula las presiones de salida de una columna de lÃ­quido de un pozo mediante iteraciones a partir ade la densidad y de la relacion de solubilidad, de la densidad relativa del gas y de la presiÃ³n de cabeza
+%calcula las presiones de salida de una columna de líquido de un pozo mediante iteraciones a partir ade la densidad y de la relacion de solubilidad, de la densidad relativa del gas y de la presión de cabeza
 %se calcula el primer punto de burbuja 
 
 %Datos de Entrada 
@@ -15,88 +15,57 @@ RGA = 54 ; %Unidades m^3/m^3
 Qo = 5000; %Barriles por dia
 Pwf = 2487; %Presion De Fondo Fluyendo en PSIA
 Pws = 2510; %Presion estatica o superficie en PSIA
-RsCE = RGA*5.615; % RelaciÃ³n de gas disuelto en soluciÃ³n (petroleo) para condiciones estandar. aproximidamente es una relaciÃ³n de solubilidad de gas, cambia en funcion de la presiÃ³n y temperatura
 P_atm = 14.7; %Presion atmosferica en PSIA
 Densidad_aire = 0.0764; %Densidad del Aire en lb//ft^3
 Angulo=90;
-
-%Se calcula la Densidad del aceite a partir de API
-Densidad_aceite=141.5/(Grados_API+131.5); 
-
 Viscosidad_aceite=24 ;%En Unidades Centipoise [cp]
 Qo_propuestoCE=5000 ;%Gasto Propuesto en bpd
 DensidadR_agua=62.4 ;
 
-%Calculo de la Presion de burbuja
-P_burbuja = 18.2*( ( (Rs/DensidadR_gas)^.83) * 10 ^( (0.00091*T_cabeza) - (0.0125*Grados_API) ) - 1.4);
+%Opciones de calculo
+%CalculoCorrelaciones = {'Standing', 'Vazquez'}
+Opcion = 'Vazquez';
+%Opcion = 'Standing';
 
-%{
-
-
-Grados_API = 25;
-Pwh = 132; %Presion de Cabeza
-Tr = 7; %Tuberia de revestimiento
-Tp = 3; %Tuberia de Produccion
-Rugosidad = 0.0006;
-DensidadR_gas = 0.68;
-L = 6500; %En pies
-T_cabeza =  60 ;%Farenheit
-T_fondo = 230 ; %Temperatura de Fondo en Farenheit
-RGA = 62 ; %Unidades m^3/m^3
-Qo = 4500; %Barriles por dia
-Pwf = 2487; %Presion De Fondo Fluyendo en PSIA
-Pws = 2510; %Presion estatica o superficie en PSIA
-RsCE = 348.13; % RelaciÃ³n de gas disuelto en soluciÃ³n (petroleo) para condiciones estandar. aproximidamente es una relaciÃ³n de solubilidad de gas, cambia en funcion de la presiÃ³n y temperatura
-P_atm = 14.7; %Presion atmosferica en PSIA
-Densidad_aire = 0.0764; %Densidad del Aire en lb//ft^3
-Angulo=90;
+%calcul;os
+RsCE = RGA*5.615; % Relación de gas disuelto en solución (petroleo) para condiciones estandar. aproximidamente es una relación de solubilidad de gas, cambia en funcion de la presión y temperatura
 
 %Se calcula la Densidad del aceite a partir de API
 Densidad_aceite=141.5/(Grados_API+131.5); 
 
-Viscosidad_aceite=24 ;%En Unidades Centipoise [cp]
-Qo_propuestoCE=5000 ;%Gasto Propuesto en bpd
-DensidadR_agua=62.4 ;
-
-
-
-%}
-
 %Calculo de la Presion de burbuja
-P_burbuja = 18.2*( ( (Rs/DensidadR_gas)^.83) * 10 ^( (0.00091*T_cabeza) - (0.0125*Grados_API) ) - 1.4);
+P_burbuja = 18.2*( ( (RsCE/DensidadR_gas)^.83) * 10 ^( (0.00091*T_cabeza) - (0.0125*Grados_API) ) - 1.4);
 
-
-
-%calcular presiones mediante iteraciones
-%Error = 0.000001;
 
 %distancia
-DistanciaDivision = 100; %el nÃºmero de pies que el usuario quiere evaluar la nueva presion. verificar que sea menor a L
+DistanciaDivision = 100; %el número de pies que el usuario quiere evaluar la nueva presion. verificar que sea menor a L
 vectorDistancia = 0:DistanciaDivision:L;
 tamVector = length(vectorDistancia);
 
 %presion
-aumentoPresionAproxPorPie = .2;%.135; %esta es una condiciÃ³n experimental, estÃ¡ entre 10 y 30, tipicamente 20
+aumentoPresionAproxPorPie = .2;%.135; %esta es una condición experimental, está entre 10 y 30, tipicamente 20
 aumentoPresionAproxPorDivision = DistanciaDivision * aumentoPresionAproxPorPie; 
-P_salida = NaN(tamVector-1 , 1); %este vector comienza en la posiciÃ³n 2 del vector distancia
+P_salida = NaN(tamVector-1 , 1); %este vector comienza en la posición 2 del vector distancia
 
 %temperatura
 %vectorTemperatura = NaN(tamVector);
 pendienteTemperatura = (T_fondo - T_cabeza) / L;
 vectorTemperatura = pendienteTemperatura * vectorDistancia + T_cabeza;
 
+%calcular presiones mediante iteraciones
+
 for i = 1:length(P_salida)
 	Error = 100;
 	primerIteracionWhile = true;
 
 	while Error > 0.00000001
-		%presiÃ³n
+		%presión
 		if i == 1
 			P_entrada = Pwh;
 		else
 			P_entrada = P_salida(i-1);
 		end
-		%valor semilla presiÃ³n
+		%valor semilla presión
 		if primerIteracionWhile == true 
 			P_supuesta = P_entrada + aumentoPresionAproxPorDivision;
 			primerIteracionWhile = false;
@@ -112,38 +81,10 @@ for i = 1:length(P_salida)
 		T_promedio = mean([T_entrada, T_salida]);
 
 		%densidad de gas disuelto y solubilidad
-		%iteraciÃ³n \
+		%iteración \
 
-		%Vazquez
-		%{
-		if Grados_API <=30
-			Constantes = [.03062, 1.0937, 25.724];
-		elseif Grados_API > 30
-			Constantes = [.0178, 1.187, 23.931];
-		end
-		%}
+		[Rs, Densidad_gasDisuelto] = FuncionCorrelaciones(Opcion, Grados_API, DensidadR_gas, P_promedio, T_promedio);
 
-		%Rs = Constantes(1) * DensidadR_gas * P_promedio ^ Constantes(2) * exp( Constantes(3) * (Grados_API/ (T_promedio + 460) ) ); %Vazquez
-		Rs = DensidadR_gas * ( (P_promedio / 18.2 + 1.4) * 10 ^ (0.0125 * Grados_API - 0.00091 * T_promedio) ) ^ (1 / 0.83); %Standing
-		Densidad_gasDisuelto = 0.25 + (.02 * Grados_API) + (Rs* 1E-6) * (0.0874 - 3.5864 * Grados_API);
-		
-		ErrorSolubilidad = 100;
-		ErrorGasDisuelto = 100;
-
-		NormaError = sqrt(ErrorGasDisuelto^2 + ErrorSolubilidad^2);
-		
-		while NormaError > .00000001
-			RsAnterior = Rs;
-			Densidad_gasDisueltoAnterior = Densidad_gasDisuelto;
-			
-			%Rs = Constantes(1) * Densidad_gasDisuelto * P_promedio ^ Constantes(2) * exp( Constantes(3) * (Grados_API/ (T_promedio + 460) ) ); Vazquez
-			Rs = Densidad_gasDisuelto * ( (P_promedio / 18.2 + 1.4) * 10 ^ (0.0125 * Grados_API - 0.00091 * T_promedio) ) ^ (1 / 0.83); %Standing
-			Densidad_gasDisuelto = 0.25 + (.02 * Grados_API) + (Rs* 1E-6) * (0.0874 - 3.5864 * Grados_API);
-
-			ErrorSolubilidad= abs(Rs - RsAnterior);
-			ErrorGasDisuelto = abs(Densidad_gasDisuelto - Densidad_gasDisueltoAnterior);
-			NormaError = sqrt(ErrorGasDisuelto^2 + ErrorSolubilidad^2);		
-		end
 
 		Densidad_gasL = (abs( (RsCE * DensidadR_gas) - Rs * Densidad_gasDisuelto) ) / ( RsCE - Rs );
 		
@@ -188,7 +129,15 @@ for i = 1:length(P_salida)
 		RelacionHLPsi=(0.0745*0.000841+1.0725*Xmayuscula^0.884)/(0.000841+Xmayuscula^0.884);
 		zi=(Ngv*Nlmu^0.1)/(Nd^2.14);
 		Psi=(0.97471888*0.0102865321+1.7467011*zi^3.8462632)/(0.0102865321+zi^3.8462632);
+		
+
 		HL=Psi*RelacionHLPsi;
+		
+		if HL < Landa_L
+			%disp('Menor');
+			HL = Landa_L;
+		end
+
 		Pm=(Rog_CF*(1-HL))+(Ro_aceiteCF*HL);
 		Uns=(Viscosidad_gas*(1-Landa_L))+(Viscosidad_aceite*Landa_L);
 		NRE=(1488*Pm*vm*(Tp/12))/Uns;
@@ -202,12 +151,13 @@ for i = 1:length(P_salida)
 			ErrorFf = abs(Ff - FfAnterior);
 		end
 
-		RelacionDpDht= (Ff * Pm * vm^2) / (144 * 2 * 32.2* (Tp/12) ) + (Pm * sin( deg2rad(Angulo) )) / 144 ;
+		%RelacionDpDht= (Ff * Pm * vm^2) / (144 * 2 * 32.2* (Tp/12) ) + (Pm * sin( deg2rad(Angulo) )) / 144 ;%este es el bien calculado
+		RelacionDpDht= (Ff * Pm * vm^2) / (144 * 2 * 32.2* (Tp/12) ) + (Pm * sin( Angulo )) / 144 ; %este es el mal calculado (como en Excel)
+
 		DeltaP=RelacionDpDht*DistanciaDivision;
 		P_salida(i) = DeltaP + P_entrada;
 
-
-		Error = abs(P_salida - P_supuesta);%recalcular el error
+		Error = abs(P_salida(i) - P_supuesta);%recalcular el error
 	end
 end
 
