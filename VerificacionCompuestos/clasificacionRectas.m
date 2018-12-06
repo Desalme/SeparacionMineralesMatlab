@@ -1,4 +1,4 @@
-function [cellSobrantesClasificados] = clasificacionRectas(cellRegistrosPetrofisicos, indicesSobrantes)
+function [cellSobrantesClasificados, matrizSobrantes_DT_NPHI_RHOB] = clasificacionRectas(cellRegistrosPetrofisicos, indicesSobrantes)
 	%clasifica los puntos fuera de las regiones de acuerdo a la minimizacion de la distancia respecto a unas rectas	
 	[tamx tamy] = size(cellRegistrosPetrofisicos);
 	nombres={'DT','NPHI','RHOB'};
@@ -77,5 +77,7 @@ function [cellSobrantesClasificados] = clasificacionRectas(cellRegistrosPetrofis
 		[minimaDistancia, indiceDistancia] = min(distancias);
 		cellSobrantesClasificados{puntosM,3} = rectasM{indiceDistancia, 1};
 	end
+
+	matrizSobrantes_DT_NPHI_RHOB = [matrizDTExtraidos, matrizNPHIExtraidos, matrizRHOBExtraidos];
 
 end

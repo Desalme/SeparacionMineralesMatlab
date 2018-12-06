@@ -25,7 +25,7 @@
 	toc
 
 	%escribir datos
-	nombreArchivoSalida='PruebaSalida.xlsx';
+	nombreArchivoSalida='Salida.xlsx';
 
 	strNombreCompuestos=["GYPANHDOL","ArcillaDOLSIL", "DOLCALSIL", "SalSIL","FI2DOLDOLCaCO", "FI2CaCOCaCODOL", "FI2CaCOCaCOSil", "FI2SilSilCaCO"];
 	%strNombreCompuestos=["ArcillaDOLSIL"]
@@ -79,6 +79,10 @@
 	tic
 	%Registros geológicos y matrices
 	registrosGeologicos={'DT','NPHI','RHOB'}; %no mover este orden porque se utiliza para la cosntruccion de abajo
+	%%%%%%%%%%%%%%%%
+	%================
+	%%%%%%%%%%%%%%%%
+	%AQUÍ ESTÁ EL OTRO ARCHIVO DE LOS DATOS
 	cellVectoresIndependientes=leerRegistrosGeologicos('NuevoPozoPruebaDatos.xlsx','Hoja1',registrosGeologicos); %construye un cell array donde cada entrada es una columna de 4*1 donde cada entrada es un vector independiente 
 	
 	%inicializar cell arrays que tengan la matriz de coeficientes A y el vector independiente b para resolver un sistema de ecuaiones lineales 
@@ -160,12 +164,25 @@
 	end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	[cellSobrantesClasificacionRectas, matrizSobrantes_DT_NPHI_RHOB] = clasificacionRectas(cellRegistrosPetrofisicos, indicesSobrantes);
+
+	[cellSobrantesClasificacionConclusion, cellTodoslosDatos] = clasicarDatosSobrantes(cellSobrantesClasificacionRectas, cellTodoslosDatos); 
+
+	encabezadosSobrantes={'No.', 'N', 'M', 'Consistente', 'DT', 'RHOB', 'NPHI'};
+	[mS nS] = size(matrizSobrantes_DT_NPHI_RHOB);
+	cellSobrantesSalida = mat2cell(matrizSobrantes_DT_NPHI_RHOB, ones(mS,1), ones(nS,1));
+	%cellIntermedio = [cellSobrantesClasificacionConclusion, matrizSobrantes_DT_NPHI_RHOB];
+	datosExcelSobrantes=[encabezadosSobrantes; cellSobrantesClasificacionConclusion, cellSobrantesSalida ];
+	xlswrite(nombreArchivoSalida,datosExcelSobrantes,'Sobrantes');
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%graficar
 	tic
 	%colores RGB
 	colores={[.9,.22,.21],[.925,.251,.478],[.482,.122,.635],[.102,.137,.494],[.129,.588,.952],[.149,.776,.855],[.302,.714,.675],[.263,.627,.278], [.804,.863,.224],[1,.769,0], [.937,.424,0]};
 	
 	%1rojo, 2rosa, 3morado, 4indigo, 5azul, 6cyan, 7aqua, 8verde, 9lima, 10ambar, 11naranjaFuerte
+	%==================================================================================%Graficar la figura principal
+	figure('Name','GraficaPrincipal');
 	graphObjArr=gobjects(1,longitud);
 	hold on;
 	%graficarinterfaces
@@ -183,6 +200,57 @@
 	%saveas(gcf,'graficoLitoporosidad.png');
 	print('graficoLitoporosidad','-dpng','-r0') %guardar el archivo en imagen Use '-r0' to save it with screen resolution
 	toc
+
+%=====================================================
+	figure('NumberTitle','off','Name', 'RectasN');
+	[cellPuntosDeRecta] = datosRectasN();
+	hold on
+	[mN nN] = size(cellPuntosDeRecta);
+	leyenda = cellPuntosDeRecta(:,1);
+	for i=1:mN
+		graficaX = [ cellPuntosDeRecta{i,2}(1), cellPuntosDeRecta{i,3}(1) ];
+		graficaY = [ cellPuntosDeRecta{i,2}(2), cellPuntosDeRecta{i,3}(2) ];
+		plot( graficaX, graficaY, 'Linewidth', 1.5);
+	end
+	sobrantesX = matrizSobrantes_DT_NPHI_RHOB(:,3);
+	sobrantesY = matrizSobrantes_DT_NPHI_RHOB(:,2);
+	plot(sobrantesX,sobrantesY, 'LineStyle', 'none', 'Marker', '.', 'MarkerSize', 10 );
+
+	ax = gca;
+	ax.YDir = 'normal';
+	ax.XDir = 'reverse';
+	ax.XLim = [1,4];
+	title('N', 'Fontsize', 18);
+	xlabel('Densidad de matriz');
+	ylabel('\phi Neutron');
+	legend(leyenda, 'Location', 'northwest');
+	print('N','-dpng','-r0');
+	%ax.YLim = [1,]
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+	figure('Name', 'RectasM');
+	[cellPuntosDeRecta] = datosRectasM();
+	hold on
+	[mM nM] = size(cellPuntosDeRecta);
+	leyenda = cellPuntosDeRecta(:,1);
+	for i=1:mM
+		graficaX = [ cellPuntosDeRecta{i,2}(1), cellPuntosDeRecta{i,3}(1) ];
+		graficaY = [ cellPuntosDeRecta{i,2}(2), cellPuntosDeRecta{i,3}(2) ];
+		plot( graficaX, graficaY, 'Linewidth', 1.5);
+	end
+	sobrantesX = matrizSobrantes_DT_NPHI_RHOB(:,3);
+	sobrantesY = matrizSobrantes_DT_NPHI_RHOB(:,1);
+	plot(sobrantesX,sobrantesY, 'LineStyle', 'none', 'Marker', '.', 'MarkerSize', 10);
+
+	ax = gca;
+	ax.YDir = 'normal';
+	ax.XDir = 'reverse';
+	ax.XLim = [1,4];
+	title('M', 'Fontsize', 18);
+	xlabel('\rho B ');
+	ylabel('DT');
+	legend(leyenda, 'Location', 'northwest');
+	print('M','-dpng','-r0');
 %end
 
 

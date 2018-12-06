@@ -3,7 +3,7 @@ function [cellPuntosDeRecta] = datosRectasM()
 	PAgua=[1, 189];
 
 	cellPuntosDeRecta={
-	'Silica1', [2.65, 55.5], PAgua;
+	'Silica', [2.65, 55.5], PAgua;
 	'CaCO3', [2.71, 47.6], PAgua;
 	'DOLOMITE2', [2.87, 43.5], PAgua;
 	'ANHYDRITE', [2.98, 50], PAgua;
